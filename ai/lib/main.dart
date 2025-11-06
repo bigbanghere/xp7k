@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                                     contentPadding:
                                         _controller.text.split('\n').length > 1
                                             ? const EdgeInsets.only(
-                                                left: 0, right: 0, top: 5)
+                                                left: 0, right: 0, top: 11)
                                             : const EdgeInsets.only(right: 0),
                                   ),
                                 ),
