@@ -2,13 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'analytics.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize Vercel Analytics after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      VercelAnalytics.init();
+      // Track initial page view
+      VercelAnalytics.trackPageView(path: '/', title: 'Home');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,6 +167,15 @@ class _HomePageState extends State<HomePage> {
     print('_navigateToNewPage called with text: "$text"'); // Debug
     if (text.isNotEmpty) {
       print('Navigating to NewPage with title: "$text"'); // Debug
+
+      // Track question submission event
+      VercelAnalytics.trackEvent('question_submitted', properties: {
+        'question_length': text.length.toString(),
+      });
+
+      // Track page view for response page
+      VercelAnalytics.trackPageView(path: '/response', title: 'Response');
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -158,6 +184,8 @@ class _HomePageState extends State<HomePage> {
       ).then((_) {
         // Clear the text field after navigation
         _controller.clear();
+        // Track return to home page
+        VercelAnalytics.trackPageView(path: '/', title: 'Home');
       });
     } else {
       print('Text is empty, not navigating'); // Debug

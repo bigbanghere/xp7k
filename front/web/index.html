@@ -54,6 +54,56 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tma.js/sdk@2.5.0/dist/index.iife.js"></script>
+  <!-- Vercel Analytics -->
+  <!-- This script is automatically provided by Vercel when deployed -->
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script>
+    // Wait for Vercel Analytics to load and expose functions for Dart interop
+    (function() {
+      function setupVercelAnalytics() {
+        // Check if va (Vercel Analytics) is available
+        if (window.va) {
+          // Expose analytics functions globally for Dart interop
+          window.vercelAnalytics = {
+            track: function(name, options) {
+              // Track custom events
+              if (window.va && window.va.track) {
+                if (typeof name === 'string' && options) {
+                  // Custom event with properties
+                  window.va.track(name, options);
+                } else if (typeof name === 'object') {
+                  // Event object passed directly
+                  window.va.track(name);
+                } else if (typeof name === 'string') {
+                  // Just event name
+                  window.va.track(name);
+                }
+              }
+            }
+          };
+          console.log('Vercel Analytics initialized');
+          return true;
+        }
+        return false;
+      }
+      
+      // Try immediately
+      if (!setupVercelAnalytics()) {
+        // Retry after script loads (with timeout)
+        var attempts = 0;
+        var maxAttempts = 50; // 5 seconds max
+        var interval = setInterval(function() {
+          attempts++;
+          if (setupVercelAnalytics() || attempts >= maxAttempts) {
+            clearInterval(interval);
+            if (attempts >= maxAttempts) {
+              console.warn('Vercel Analytics not available (may not be deployed to Vercel)');
+            }
+          }
+        }, 100);
+      }
+    })();
+  </script>
   <script>
     (function() {
       // Function to disable swipe-to-close
