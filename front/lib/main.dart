@@ -796,39 +796,50 @@ class _SimpleMainPageState extends State<SimpleMainPage>
                                 ),
                               ),
                               Expanded(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SvgPicture.asset(
-                                      AppTheme.isLightTheme
-                                          ? 'assets/icons/menu/trade_light.svg'
-                                          : 'assets/icons/menu/trade_dark.svg',
-                                      width: 30,
-                                      height: 30,
-                                    ),
-                                    const SizedBox(height: 5),
-                                    SizedBox(
-                                      height: 15,
-                                      child: Center(
-                                        child: Text(
-                                          'Trade',
-                                          style: TextStyle(
-                                            fontFamily: 'Aeroport',
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppTheme.textColor,
-                                            height: 1.0,
-                                          ),
-                                          textHeightBehavior:
-                                              const TextHeightBehavior(
-                                            applyHeightToFirstAscent: false,
-                                            applyHeightToLastDescent: false,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const TradePage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      SvgPicture.asset(
+                                        AppTheme.isLightTheme
+                                            ? 'assets/icons/menu/trade_light.svg'
+                                            : 'assets/icons/menu/trade_dark.svg',
+                                        width: 30,
+                                        height: 30,
+                                      ),
+                                      const SizedBox(height: 5),
+                                      SizedBox(
+                                        height: 15,
+                                        child: Center(
+                                          child: Text(
+                                            'Trade',
+                                            style: TextStyle(
+                                              fontFamily: 'Aeroport',
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppTheme.textColor,
+                                              height: 1.0,
+                                            ),
+                                            textHeightBehavior:
+                                                const TextHeightBehavior(
+                                              applyHeightToFirstAscent: false,
+                                              applyHeightToLastDescent: false,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                               Expanded(
@@ -4702,6 +4713,23 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
           ),
         ),
       ),
+    );
+  }
+}
+
+class TradePage extends StatefulWidget {
+  const TradePage({super.key});
+
+  @override
+  State<TradePage> createState() => _TradePageState();
+}
+
+class _TradePageState extends State<TradePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
+      body: Container(),
     );
   }
 }
