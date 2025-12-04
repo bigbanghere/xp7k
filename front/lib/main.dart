@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:js' as js;
 import 'analytics.dart';
-import 'safe_area_debug_panel.dart';
+import 'telegram_safe_area.dart';
 
 // Theme helper class
 class AppTheme {
@@ -333,6 +333,28 @@ class SimpleMainPage extends StatefulWidget {
 
 class _SimpleMainPageState extends State<SimpleMainPage>
     with TickerProviderStateMixin {
+  // Helper method to calculate logo top padding
+  double _getLogoTopPadding() {
+    final service = TelegramSafeAreaService();
+    final safeAreaInset = service.getSafeAreaInset();
+    final contentSafeAreaInset = service.getContentSafeAreaInset();
+
+    // Formula: top SafeAreaInset + (top ContentSafeAreaInset / 2) - 15
+    // This centers the 30px logo in the content safe area zone, respecting the upper inset
+    final topPadding = safeAreaInset.top + (contentSafeAreaInset.top / 2) - 15;
+    return topPadding;
+  }
+
+  // Helper method to calculate adaptive bottom padding
+  double _getAdaptiveBottomPadding() {
+    final service = TelegramSafeAreaService();
+    final safeAreaInset = service.getSafeAreaInset();
+
+    // Formula: bottom SafeAreaInset + 30px
+    final bottomPadding = safeAreaInset.bottom + 30;
+    return bottomPadding;
+  }
+
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final GlobalKey _textFieldKey = GlobalKey();
@@ -552,114 +574,101 @@ class _SimpleMainPageState extends State<SimpleMainPage>
                 ),
               ),
               child!,
-              // Safe Area Debug Panel
-              const SafeAreaDebugPanel(),
             ],
           );
         },
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(
-                      top: 30, bottom: 15, left: 15, right: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        AppTheme.isLightTheme
-                            ? 'assets/images/logo_light.svg'
-                            : 'assets/images/logo_dark.svg',
-                        width: 30,
-                        height: 30,
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: _getAdaptiveBottomPadding()),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.only(
+                          top: _getLogoTopPadding(),
+                          bottom: 15,
+                          left: 15,
+                          right: 15),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            '..xk5str4e',
-                            style: TextStyle(
-                              fontFamily: 'Aeroport Mono',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: AppTheme.textColor,
-                            ),
+                          SvgPicture.asset(
+                            AppTheme.isLightTheme
+                                ? 'assets/images/logo_light.svg'
+                                : 'assets/images/logo_dark.svg',
+                            width: 30,
+                            height: 30,
                           ),
+                          const SizedBox(height: 15),
                           Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  // Copy action
-                                },
-                                child: SvgPicture.asset(
-                                  'assets/icons/copy.svg',
-                                  width: 15,
-                                  height: 15,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () {
-                                  // Edit action
-                                },
-                                child: SvgPicture.asset(
-                                  'assets/icons/edit.svg',
-                                  width: 15,
-                                  height: 15,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () {
-                                  // Exit action
-                                },
-                                child: SvgPicture.asset(
-                                  'assets/icons/exit.svg',
-                                  width: 15,
-                                  height: 15,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            r'$345,768.64',
-                            style: TextStyle(
-                              fontFamily: 'Aeroport',
-                              fontSize: 30,
-                              fontWeight: FontWeight.w400,
-                              color: AppTheme.textColor,
-                              height: 1.0,
-                            ),
-                            textHeightBehavior: const TextHeightBehavior(
-                              applyHeightToFirstAscent: false,
-                              applyHeightToLastDescent: false,
-                            ),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                'Wallet 1',
+                                '..xk5str4e',
+                                style: TextStyle(
+                                  fontFamily: 'Aeroport Mono',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppTheme.textColor,
+                                ),
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      // Copy action
+                                    },
+                                    child: SvgPicture.asset(
+                                      'assets/icons/copy.svg',
+                                      width: 15,
+                                      height: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  GestureDetector(
+                                    onTap: () {
+                                      // Edit action
+                                    },
+                                    child: SvgPicture.asset(
+                                      'assets/icons/edit.svg',
+                                      width: 15,
+                                      height: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  GestureDetector(
+                                    onTap: () {
+                                      // Exit action
+                                    },
+                                    child: SvgPicture.asset(
+                                      'assets/icons/exit.svg',
+                                      width: 15,
+                                      height: 15,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              Text(
+                                r'$345,768.64',
                                 style: TextStyle(
                                   fontFamily: 'Aeroport',
-                                  fontSize: 15,
+                                  fontSize: 30,
                                   fontWeight: FontWeight.w400,
                                   color: AppTheme.textColor,
                                   height: 1.0,
@@ -669,507 +678,545 @@ class _SimpleMainPageState extends State<SimpleMainPage>
                                   applyHeightToLastDescent: false,
                                 ),
                               ),
-                              const SizedBox(width: 5),
-                              SvgPicture.asset(
-                                AppTheme.isLightTheme
-                                    ? 'assets/icons/select_light.svg'
-                                    : 'assets/icons/select_dark.svg',
-                                width: 5,
-                                height: 10,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  AppTheme.isLightTheme
-                                      ? 'assets/icons/menu/get_light.svg'
-                                      : 'assets/icons/menu/get_dark.svg',
-                                  width: 30,
-                                  height: 30,
-                                ),
-                                const SizedBox(height: 5),
-                                SizedBox(
-                                  height: 15,
-                                  child: Center(
-                                    child: Text(
-                                      'Get',
-                                      style: TextStyle(
-                                        fontFamily: 'Aeroport',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppTheme.textColor,
-                                        height: 1.0,
-                                      ),
-                                      textHeightBehavior:
-                                          const TextHeightBehavior(
-                                        applyHeightToFirstAscent: false,
-                                        applyHeightToLastDescent: false,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const HomePage(),
-                                  ),
-                                );
-                              },
-                              child: Column(
+                              Row(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  Text(
+                                    'Wallet 1',
+                                    style: TextStyle(
+                                      fontFamily: 'Aeroport',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppTheme.textColor,
+                                      height: 1.0,
+                                    ),
+                                    textHeightBehavior:
+                                        const TextHeightBehavior(
+                                      applyHeightToFirstAscent: false,
+                                      applyHeightToLastDescent: false,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
                                   SvgPicture.asset(
                                     AppTheme.isLightTheme
-                                        ? 'assets/icons/menu/swap_light.svg'
-                                        : 'assets/icons/menu/swap_dark.svg',
-                                    width: 30,
-                                    height: 30,
-                                  ),
-                                  const SizedBox(height: 5),
-                                  SizedBox(
-                                    height: 15,
-                                    child: Center(
-                                      child: Text(
-                                        'Swap',
-                                        style: TextStyle(
-                                          fontFamily: 'Aeroport',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppTheme.textColor,
-                                          height: 1.0,
-                                        ),
-                                        textHeightBehavior:
-                                            const TextHeightBehavior(
-                                          applyHeightToFirstAscent: false,
-                                          applyHeightToLastDescent: false,
-                                        ),
-                                      ),
-                                    ),
+                                        ? 'assets/icons/select_light.svg'
+                                        : 'assets/icons/select_dark.svg',
+                                    width: 5,
+                                    height: 10,
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  AppTheme.isLightTheme
-                                      ? 'assets/icons/menu/trade_light.svg'
-                                      : 'assets/icons/menu/trade_dark.svg',
-                                  width: 30,
-                                  height: 30,
-                                ),
-                                const SizedBox(height: 5),
-                                SizedBox(
-                                  height: 15,
-                                  child: Center(
-                                    child: Text(
-                                      'Trade',
-                                      style: TextStyle(
-                                        fontFamily: 'Aeroport',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppTheme.textColor,
-                                        height: 1.0,
-                                      ),
-                                      textHeightBehavior:
-                                          const TextHeightBehavior(
-                                        applyHeightToFirstAscent: false,
-                                        applyHeightToLastDescent: false,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  AppTheme.isLightTheme
-                                      ? 'assets/icons/menu/send_light.svg'
-                                      : 'assets/icons/menu/send_dark.svg',
-                                  width: 30,
-                                  height: 30,
-                                ),
-                                const SizedBox(height: 5),
-                                SizedBox(
-                                  height: 15,
-                                  child: Center(
-                                    child: Text(
-                                      'Send',
-                                      style: TextStyle(
-                                        fontFamily: 'Aeroport',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppTheme.textColor,
-                                        height: 1.0,
-                                      ),
-                                      textHeightBehavior:
-                                          const TextHeightBehavior(
-                                        applyHeightToFirstAscent: false,
-                                        applyHeightToLastDescent: false,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedTab = 'Coins';
-                              });
-                            },
-                            child: Text(
-                              'Coins',
-                              style: TextStyle(
-                                fontFamily: 'Aeroport',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: _selectedTab == 'Coins'
-                                    ? AppTheme.textColor
-                                    : const Color(0xFF818181),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 15),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedTab = 'Items';
-                              });
-                            },
-                            child: Text(
-                              'Items',
-                              style: TextStyle(
-                                fontFamily: 'Aeroport',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: _selectedTab == 'Items'
-                                    ? AppTheme.textColor
-                                    : const Color(0xFF818181),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 15),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedTab = 'History';
-                              });
-                            },
-                            child: Text(
-                              'History',
-                              style: TextStyle(
-                                fontFamily: 'Aeroport',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: _selectedTab == 'History'
-                                    ? AppTheme.textColor
-                                    : const Color(0xFF818181),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      // Coins list - shown when Coins tab is selected
-                      if (_selectedTab == 'Coins')
-                        Column(
-                          children: _coins.map((coin) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 20),
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 0),
-                                child: Row(
+                          const SizedBox(height: 30),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    // Coin icon - 30px, centered vertically relative to 40px text columns
-                                    Image.asset(
-                                      coin['icon'] as String,
+                                    SvgPicture.asset(
+                                      AppTheme.isLightTheme
+                                          ? 'assets/icons/menu/get_light.svg'
+                                          : 'assets/icons/menu/get_dark.svg',
                                       width: 30,
                                       height: 30,
-                                      fit: BoxFit.contain,
                                     ),
-                                    const SizedBox(width: 10),
-                                    // Coin ticker and blockchain column
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            height: 20,
-                                            child: Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                coin['ticker'] as String,
-                                                style: TextStyle(
-                                                  fontFamily: 'Aeroport',
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppTheme.textColor,
-                                                  height: 1.0,
-                                                ),
-                                                textHeightBehavior:
-                                                    const TextHeightBehavior(
-                                                  applyHeightToFirstAscent:
-                                                      false,
-                                                  applyHeightToLastDescent:
-                                                      false,
-                                                ),
-                                              ),
-                                            ),
+                                    const SizedBox(height: 5),
+                                    SizedBox(
+                                      height: 15,
+                                      child: Center(
+                                        child: Text(
+                                          'Get',
+                                          style: TextStyle(
+                                            fontFamily: 'Aeroport',
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppTheme.textColor,
+                                            height: 1.0,
                                           ),
-                                          SizedBox(
-                                            height: 20,
-                                            child: Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                coin['blockchain'] as String,
-                                                style: const TextStyle(
-                                                  fontFamily: 'Aeroport',
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0xFF818181),
-                                                  height: 1.0,
-                                                ),
-                                                textHeightBehavior:
-                                                    const TextHeightBehavior(
-                                                  applyHeightToFirstAscent:
-                                                      false,
-                                                  applyHeightToLastDescent:
-                                                      false,
-                                                ),
-                                              ),
-                                            ),
+                                          textHeightBehavior:
+                                              const TextHeightBehavior(
+                                            applyHeightToFirstAscent: false,
+                                            applyHeightToLastDescent: false,
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                    // Amount and USD value column (right-aligned)
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        SizedBox(
-                                          height: 20,
-                                          child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Text(
-                                              coin['amount'] as String,
-                                              style: TextStyle(
-                                                fontFamily: 'Aeroport',
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppTheme.textColor,
-                                                height: 1.0,
-                                              ),
-                                              textAlign: TextAlign.right,
-                                              textHeightBehavior:
-                                                  const TextHeightBehavior(
-                                                applyHeightToFirstAscent: false,
-                                                applyHeightToLastDescent: false,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                          child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Text(
-                                              coin['usdValue'] as String,
-                                              style: const TextStyle(
-                                                fontFamily: 'Aeroport',
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w400,
-                                                color: Color(0xFF818181),
-                                                height: 1.0,
-                                              ),
-                                              textAlign: TextAlign.right,
-                                              textHeightBehavior:
-                                                  const TextHeightBehavior(
-                                                applyHeightToFirstAscent: false,
-                                                applyHeightToLastDescent: false,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ],
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(
-                      top: 10, bottom: 30, left: 15, right: 15),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          constraints: const BoxConstraints(minHeight: 30),
-                          child: _controller.text.isEmpty
-                              ? SizedBox(
-                                  height: 30,
-                                  child: TextField(
-                                    key: _textFieldKey,
-                                    controller: _controller,
-                                    focusNode: _focusNode,
-                                    enabled: true,
-                                    readOnly: false,
-                                    cursorColor: AppTheme.textColor,
-                                    cursorHeight: 15,
-                                    maxLines: 11,
-                                    minLines: 1,
-                                    textAlignVertical: TextAlignVertical.center,
-                                    style: TextStyle(
-                                        fontFamily: 'Aeroport',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        height: 2.0,
-                                        color: AppTheme.textColor),
-                                    onSubmitted: (value) {
-                                      _navigateToNewPage();
-                                    },
-                                    onChanged: (value) {},
-                                    decoration: InputDecoration(
-                                      hintText: (_isFocused ||
-                                              _controller.text.isNotEmpty)
-                                          ? null
-                                          : 'Ask anything',
-                                      hintStyle: TextStyle(
-                                          color: AppTheme.textColor,
-                                          fontFamily: 'Aeroport',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          height: 2.0),
-                                      border: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: !_isFocused
-                                          ? const EdgeInsets.only(
-                                              left: 0,
-                                              right: 0,
-                                              top: 5,
-                                              bottom: 5)
-                                          : const EdgeInsets.only(right: 0),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const HomePage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      SvgPicture.asset(
+                                        AppTheme.isLightTheme
+                                            ? 'assets/icons/menu/swap_light.svg'
+                                            : 'assets/icons/menu/swap_dark.svg',
+                                        width: 30,
+                                        height: 30,
+                                      ),
+                                      const SizedBox(height: 5),
+                                      SizedBox(
+                                        height: 15,
+                                        child: Center(
+                                          child: Text(
+                                            'Swap',
+                                            style: TextStyle(
+                                              fontFamily: 'Aeroport',
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppTheme.textColor,
+                                              height: 1.0,
+                                            ),
+                                            textHeightBehavior:
+                                                const TextHeightBehavior(
+                                              applyHeightToFirstAscent: false,
+                                              applyHeightToLastDescent: false,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(
+                                      AppTheme.isLightTheme
+                                          ? 'assets/icons/menu/trade_light.svg'
+                                          : 'assets/icons/menu/trade_dark.svg',
+                                      width: 30,
+                                      height: 30,
+                                    ),
+                                    const SizedBox(height: 5),
+                                    SizedBox(
+                                      height: 15,
+                                      child: Center(
+                                        child: Text(
+                                          'Trade',
+                                          style: TextStyle(
+                                            fontFamily: 'Aeroport',
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppTheme.textColor,
+                                            height: 1.0,
+                                          ),
+                                          textHeightBehavior:
+                                              const TextHeightBehavior(
+                                            applyHeightToFirstAscent: false,
+                                            applyHeightToLastDescent: false,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(
+                                      AppTheme.isLightTheme
+                                          ? 'assets/icons/menu/send_light.svg'
+                                          : 'assets/icons/menu/send_dark.svg',
+                                      width: 30,
+                                      height: 30,
+                                    ),
+                                    const SizedBox(height: 5),
+                                    SizedBox(
+                                      height: 15,
+                                      child: Center(
+                                        child: Text(
+                                          'Send',
+                                          style: TextStyle(
+                                            fontFamily: 'Aeroport',
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppTheme.textColor,
+                                            height: 1.0,
+                                          ),
+                                          textHeightBehavior:
+                                              const TextHeightBehavior(
+                                            applyHeightToFirstAscent: false,
+                                            applyHeightToLastDescent: false,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedTab = 'Coins';
+                                  });
+                                },
+                                child: Text(
+                                  'Coins',
+                                  style: TextStyle(
+                                    fontFamily: 'Aeroport',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: _selectedTab == 'Coins'
+                                        ? AppTheme.textColor
+                                        : const Color(0xFF818181),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 15),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedTab = 'Items';
+                                  });
+                                },
+                                child: Text(
+                                  'Items',
+                                  style: TextStyle(
+                                    fontFamily: 'Aeroport',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: _selectedTab == 'Items'
+                                        ? AppTheme.textColor
+                                        : const Color(0xFF818181),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 15),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedTab = 'History';
+                                  });
+                                },
+                                child: Text(
+                                  'History',
+                                  style: TextStyle(
+                                    fontFamily: 'Aeroport',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: _selectedTab == 'History'
+                                        ? AppTheme.textColor
+                                        : const Color(0xFF818181),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          // Coins list - shown when Coins tab is selected
+                          if (_selectedTab == 'Coins')
+                            Column(
+                              children: _coins.map((coin) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: Container(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        // Coin icon - 30px, centered vertically relative to 40px text columns
+                                        Image.asset(
+                                          coin['icon'] as String,
+                                          width: 30,
+                                          height: 30,
+                                          fit: BoxFit.contain,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        // Coin ticker and blockchain column
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                height: 20,
+                                                child: Align(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    coin['ticker'] as String,
+                                                    style: TextStyle(
+                                                      fontFamily: 'Aeroport',
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: AppTheme.textColor,
+                                                      height: 1.0,
+                                                    ),
+                                                    textHeightBehavior:
+                                                        const TextHeightBehavior(
+                                                      applyHeightToFirstAscent:
+                                                          false,
+                                                      applyHeightToLastDescent:
+                                                          false,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                                child: Align(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    coin['blockchain']
+                                                        as String,
+                                                    style: const TextStyle(
+                                                      fontFamily: 'Aeroport',
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Color(0xFF818181),
+                                                      height: 1.0,
+                                                    ),
+                                                    textHeightBehavior:
+                                                        const TextHeightBehavior(
+                                                      applyHeightToFirstAscent:
+                                                          false,
+                                                      applyHeightToLastDescent:
+                                                          false,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // Amount and USD value column (right-aligned)
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            SizedBox(
+                                              height: 20,
+                                              child: Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Text(
+                                                  coin['amount'] as String,
+                                                  style: TextStyle(
+                                                    fontFamily: 'Aeroport',
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppTheme.textColor,
+                                                    height: 1.0,
+                                                  ),
+                                                  textAlign: TextAlign.right,
+                                                  textHeightBehavior:
+                                                      const TextHeightBehavior(
+                                                    applyHeightToFirstAscent:
+                                                        false,
+                                                    applyHeightToLastDescent:
+                                                        false,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 20,
+                                              child: Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Text(
+                                                  coin['usdValue'] as String,
+                                                  style: const TextStyle(
+                                                    fontFamily: 'Aeroport',
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xFF818181),
+                                                    height: 1.0,
+                                                  ),
+                                                  textAlign: TextAlign.right,
+                                                  textHeightBehavior:
+                                                      const TextHeightBehavior(
+                                                    applyHeightToFirstAscent:
+                                                        false,
+                                                    applyHeightToLastDescent:
+                                                        false,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: TextField(
-                                    key: _textFieldKey,
-                                    controller: _controller,
-                                    focusNode: _focusNode,
-                                    enabled: true,
-                                    readOnly: false,
-                                    cursorColor: AppTheme.textColor,
-                                    cursorHeight: 15,
-                                    maxLines: 11,
-                                    minLines: 1,
-                                    textAlignVertical:
-                                        _controller.text.split('\n').length == 1
+                                );
+                              }).toList(),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      width: double.infinity,
+                      padding:
+                          const EdgeInsets.only(top: 10, left: 15, right: 15),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              constraints: const BoxConstraints(minHeight: 30),
+                              child: _controller.text.isEmpty
+                                  ? SizedBox(
+                                      height: 30,
+                                      child: TextField(
+                                        key: _textFieldKey,
+                                        controller: _controller,
+                                        focusNode: _focusNode,
+                                        enabled: true,
+                                        readOnly: false,
+                                        cursorColor: AppTheme.textColor,
+                                        cursorHeight: 15,
+                                        maxLines: 11,
+                                        minLines: 1,
+                                        textAlignVertical:
+                                            TextAlignVertical.center,
+                                        style: TextStyle(
+                                            fontFamily: 'Aeroport',
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            height: 2.0,
+                                            color: AppTheme.textColor),
+                                        onSubmitted: (value) {
+                                          _navigateToNewPage();
+                                        },
+                                        onChanged: (value) {},
+                                        decoration: InputDecoration(
+                                          hintText: (_isFocused ||
+                                                  _controller.text.isNotEmpty)
+                                              ? null
+                                              : 'Ask anything',
+                                          hintStyle: TextStyle(
+                                              color: AppTheme.textColor,
+                                              fontFamily: 'Aeroport',
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              height: 2.0),
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: !_isFocused
+                                              ? const EdgeInsets.only(
+                                                  left: 0,
+                                                  right: 0,
+                                                  top: 5,
+                                                  bottom: 5)
+                                              : const EdgeInsets.only(right: 0),
+                                        ),
+                                      ),
+                                    )
+                                  : Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: TextField(
+                                        key: _textFieldKey,
+                                        controller: _controller,
+                                        focusNode: _focusNode,
+                                        enabled: true,
+                                        readOnly: false,
+                                        cursorColor: AppTheme.textColor,
+                                        cursorHeight: 15,
+                                        maxLines: 11,
+                                        minLines: 1,
+                                        textAlignVertical: _controller.text
+                                                    .split('\n')
+                                                    .length ==
+                                                1
                                             ? TextAlignVertical.center
                                             : TextAlignVertical.bottom,
-                                    style: TextStyle(
-                                        fontFamily: 'Aeroport',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        height: 2,
-                                        color: AppTheme.textColor),
-                                    onSubmitted: (value) {
-                                      _navigateToNewPage();
-                                    },
-                                    onChanged: (value) {},
-                                    decoration: InputDecoration(
-                                      hintText: (_isFocused ||
-                                              _controller.text.isNotEmpty)
-                                          ? null
-                                          : 'Ask anything',
-                                      hintStyle: TextStyle(
-                                          color: AppTheme.textColor,
-                                          fontFamily: 'Aeroport',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          height: 2),
-                                      border: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding:
-                                          _controller.text.split('\n').length >
+                                        style: TextStyle(
+                                            fontFamily: 'Aeroport',
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            height: 2,
+                                            color: AppTheme.textColor),
+                                        onSubmitted: (value) {
+                                          _navigateToNewPage();
+                                        },
+                                        onChanged: (value) {},
+                                        decoration: InputDecoration(
+                                          hintText: (_isFocused ||
+                                                  _controller.text.isNotEmpty)
+                                              ? null
+                                              : 'Ask anything',
+                                          hintStyle: TextStyle(
+                                              color: AppTheme.textColor,
+                                              fontFamily: 'Aeroport',
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              height: 2),
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: _controller.text
+                                                      .split('\n')
+                                                      .length >
                                                   1
                                               ? const EdgeInsets.only(
                                                   left: 0, right: 0, top: 11)
                                               : const EdgeInsets.only(right: 0),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 7.5),
-                        child: GestureDetector(
-                          onTap: () {
-                            _navigateToNewPage();
-                          },
-                          child: SvgPicture.asset(
-                            AppTheme.isLightTheme
-                                ? 'assets/icons/apply_light.svg'
-                                : 'assets/icons/apply_dark.svg',
-                            width: 15,
-                            height: 10,
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 5),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 7.5),
+                            child: GestureDetector(
+                              onTap: () {
+                                _navigateToNewPage();
+                              },
+                              child: SvgPicture.asset(
+                                AppTheme.isLightTheme
+                                    ? 'assets/icons/apply_light.svg'
+                                    : 'assets/icons/apply_dark.svg',
+                                width: 15,
+                                height: 10,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -1186,6 +1233,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  // Helper method to calculate logo top padding
+  double _getLogoTopPadding() {
+    final service = TelegramSafeAreaService();
+    final safeAreaInset = service.getSafeAreaInset();
+    final contentSafeAreaInset = service.getContentSafeAreaInset();
+
+    // Formula: top SafeAreaInset + (top ContentSafeAreaInset / 2) - 15
+    // This centers the 30px logo in the content safe area zone, respecting the upper inset
+    final topPadding = safeAreaInset.top + (contentSafeAreaInset.top / 2) - 15;
+    return topPadding;
+  }
+
+  // Helper method to calculate adaptive bottom padding
+  double _getAdaptiveBottomPadding() {
+    final service = TelegramSafeAreaService();
+    final safeAreaInset = service.getSafeAreaInset();
+
+    // Formula: bottom SafeAreaInset + 30px
+    final bottomPadding = safeAreaInset.bottom + 30;
+    return bottomPadding;
+  }
+
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final GlobalKey _textFieldKey = GlobalKey();
@@ -1918,7 +1987,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       );
     } else if (_selectedResolution == 'min1') {
-    // For min1 resolution, use RichText to style "Today"/"Yesterday" with regular font weight
+      // For min1 resolution, use RichText to style "Today"/"Yesterday" with regular font weight
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final yesterday = today.subtract(const Duration(days: 1));
@@ -1985,12 +2054,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         );
       }
     } else {
-    // For other resolutions, use regular Text
+      // For other resolutions, use regular Text
       textWidget = Text(
-      _formatTimestamp(timestamp),
-      style: const TextStyle(
-        fontSize: 10,
-        color: Color(0xFF818181),
+        _formatTimestamp(timestamp),
+        style: const TextStyle(
+          fontSize: 10,
+          color: Color(0xFF818181),
           height: 1.0, // Fixed line height to prevent layout shift
         ),
         textHeightBehavior: const TextHeightBehavior(
@@ -2079,11 +2148,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
 
     if (!isRetry) {
-    setState(() {
-      _isLoadingChart = true;
+      setState(() {
+        _isLoadingChart = true;
         _chartError = null;
         _chartRetryCount = 0;
-    });
+      });
     }
 
     _lastChartApiCall = DateTime.now();
@@ -2148,7 +2217,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               DateTime? timestamp;
               try {
                 timestamp = DateTime.parse(timeStr).toLocal();
-            } catch (e) {
+              } catch (e) {
                 print('Error parsing timestamp: $e, timeStr: $timeStr');
                 continue;
               }
@@ -2269,13 +2338,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _handleChartError(String error) {
-          setState(() {
-            _chartDataPoints = null;
-            _chartMinPrice = null;
-            _chartMaxPrice = null;
-            _chartFirstTimestamp = null;
-            _chartLastTimestamp = null;
-            _isLoadingChart = false;
+    setState(() {
+      _chartDataPoints = null;
+      _chartMinPrice = null;
+      _chartMaxPrice = null;
+      _chartFirstTimestamp = null;
+      _chartLastTimestamp = null;
+      _isLoadingChart = false;
       _chartError = error;
     });
   }
@@ -2298,15 +2367,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           _fetchChartData(isRetry: true);
         }
       });
-      } else {
+    } else {
       // Max retries reached
-        setState(() {
-          _chartDataPoints = null;
-          _chartMinPrice = null;
-          _chartMaxPrice = null;
-          _chartFirstTimestamp = null;
-          _chartLastTimestamp = null;
-          _isLoadingChart = false;
+      setState(() {
+        _chartDataPoints = null;
+        _chartMinPrice = null;
+        _chartMaxPrice = null;
+        _chartFirstTimestamp = null;
+        _chartLastTimestamp = null;
+        _isLoadingChart = false;
         _chartError =
             'Failed to load chart after $_maxRetries attempts. Please try again later.';
       });
@@ -2331,7 +2400,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         final marketStats = data['market_stats'] as Map<String, dynamic>?;
 
         if (marketStats != null) {
-      setState(() {
+          setState(() {
             _mcap = (marketStats['mcap'] as num?)?.toDouble();
             _fdmc = (marketStats['fdmc'] as num?)?.toDouble();
             _volume24h = (marketStats['volume_usd_24h'] as num?)?.toDouble();
@@ -2443,7 +2512,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 }
               }
             }
-      } else {
+          } else {
             print('Token list fetch failed: ${tokenResponse.statusCode}');
             print('Response: ${tokenResponse.body}');
           }
@@ -2495,7 +2564,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             _sellAmount = inputAmount.toDouble();
             _isLoadingSwapAmount = false;
           });
-    } else {
+        } else {
           print(
               'No input_amount in response. Available keys: ${data.keys.toList()}');
           setState(() {
@@ -2596,7 +2665,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           final end = Alignment(0.9 - rotation, 0.8 + rotation * 0.2);
           return Stack(
             fit: StackFit.expand,
-        children: [
+            children: [
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -2663,21 +2732,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ],
           );
         },
-        child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: _getAdaptiveBottomPadding()),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       width: double.infinity,
-                  padding: const EdgeInsets.only(
-                      top: 30, bottom: 15, left: 15, right: 15),
+                      padding: EdgeInsets.only(
+                          top: _getLogoTopPadding(),
+                          bottom: 15,
+                          left: 15,
+                          right: 15),
                       child: SvgPicture.asset(
-                    AppTheme.isLightTheme
-                        ? 'assets/images/logo_light.svg'
-                        : 'assets/images/logo_dark.svg',
+                        AppTheme.isLightTheme
+                            ? 'assets/images/logo_light.svg'
+                            : 'assets/images/logo_dark.svg',
                         width: 30,
                         height: 30,
                       ),
@@ -2695,25 +2771,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   // Set flag immediately to prevent unfocus
                                   _isTappingSuggestion = true;
                                   // Request focus immediately
-                              FocusScope.of(context).requestFocus(_focusNode);
+                                  FocusScope.of(context)
+                                      .requestFocus(_focusNode);
                                   // Set text and navigate
                                   _controller.text =
                                       'What is my all wallet\'s last month profit';
                                   print(
                                       'Text set to: ${_controller.text}'); // Debug
                                   // Navigate after a short delay
-                              Future.delayed(const Duration(milliseconds: 100),
-                                  () {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 100), () {
                                     if (mounted) {
                                       _isTappingSuggestion = false;
                                       _navigateToNewPage();
                                     }
                                   });
                                 },
-                            child: MouseRegion(
+                                child: MouseRegion(
                                   cursor: SystemMouseCursors.click,
                                   child: Padding(
-                                padding: const EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                         vertical: 5.0, horizontal: 15.0),
                                     child: Text(
                                       'What is my all wallet\'s last month profit',
@@ -2721,7 +2798,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         fontFamily: 'Aeroport',
                                         fontSize: 15,
                                         fontWeight: FontWeight.w400,
-                                    color: AppTheme.textColor,
+                                        color: AppTheme.textColor,
                                       ),
                                     ),
                                   ),
@@ -2734,24 +2811,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   // Set flag immediately to prevent unfocus
                                   _isTappingSuggestion = true;
                                   // Request focus immediately
-                              FocusScope.of(context).requestFocus(_focusNode);
+                                  FocusScope.of(context)
+                                      .requestFocus(_focusNode);
                                   // Set text and navigate
                                   _controller.text = 'Advise me a token to buy';
                                   print(
                                       'Text set to: ${_controller.text}'); // Debug
                                   // Navigate after a short delay
-                              Future.delayed(const Duration(milliseconds: 100),
-                                  () {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 100), () {
                                     if (mounted) {
                                       _isTappingSuggestion = false;
                                       _navigateToNewPage();
                                     }
                                   });
                                 },
-                            child: MouseRegion(
+                                child: MouseRegion(
                                   cursor: SystemMouseCursors.click,
                                   child: Padding(
-                                padding: const EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                         vertical: 5.0, horizontal: 15.0),
                                     child: Text(
                                       'Advise me a token to buy',
@@ -2759,7 +2837,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         fontFamily: 'Aeroport',
                                         fontSize: 15,
                                         fontWeight: FontWeight.w400,
-                                    color: AppTheme.textColor,
+                                        color: AppTheme.textColor,
                                       ),
                                     ),
                                   ),
@@ -2775,7 +2853,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           children: [
                             Expanded(
                               child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
                                 child: SizedBox(
                                   width: double.infinity,
                                   child: Column(
@@ -2783,22 +2862,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       Stack(
                                         alignment: Alignment.center,
                                         children: [
-                                      Row(
+                                          Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                          Text('Toncoin',
+                                              Text('Toncoin',
                                                   style: TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                color: AppTheme.textColor,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppTheme.textColor,
                                                     fontSize: 20,
                                                   )),
-                                          const SizedBox.shrink(),
+                                              const SizedBox.shrink(),
                                               Text(
-                                            '${_formatPercentage(_priceChange24h)} (24H)',
+                                                '${_formatPercentage(_priceChange24h)} (24H)',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w300,
-                                              color: AppTheme.textColor,
+                                                  color: AppTheme.textColor,
                                                   fontSize: 15,
                                                 ),
                                               ),
@@ -2820,13 +2899,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   style: TextStyle(
                                                     fontWeight:
                                                         _selectedResolution ==
-                                                            _resolutionMap['m']
+                                                                _resolutionMap[
+                                                                    'm']
                                                             ? FontWeight.normal
                                                             : FontWeight.w500,
-                                                color: _selectedResolution ==
-                                                        _resolutionMap['m']
-                                                    ? AppTheme.textColor
-                                                    : const Color(0xFF818181),
+                                                    color:
+                                                        _selectedResolution ==
+                                                                _resolutionMap[
+                                                                    'm']
+                                                            ? AppTheme.textColor
+                                                            : const Color(
+                                                                0xFF818181),
                                                     fontSize: 15,
                                                   ),
                                                 ),
@@ -2845,13 +2928,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   style: TextStyle(
                                                     fontWeight:
                                                         _selectedResolution ==
-                                                            _resolutionMap['q']
+                                                                _resolutionMap[
+                                                                    'q']
                                                             ? FontWeight.normal
                                                             : FontWeight.w500,
-                                                color: _selectedResolution ==
-                                                        _resolutionMap['q']
-                                                    ? AppTheme.textColor
-                                                    : const Color(0xFF818181),
+                                                    color:
+                                                        _selectedResolution ==
+                                                                _resolutionMap[
+                                                                    'q']
+                                                            ? AppTheme.textColor
+                                                            : const Color(
+                                                                0xFF818181),
                                                     fontSize: 15,
                                                   ),
                                                 ),
@@ -2870,13 +2957,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   style: TextStyle(
                                                     fontWeight:
                                                         _selectedResolution ==
-                                                            _resolutionMap['h']
+                                                                _resolutionMap[
+                                                                    'h']
                                                             ? FontWeight.normal
                                                             : FontWeight.w500,
-                                                color: _selectedResolution ==
-                                                        _resolutionMap['h']
-                                                    ? AppTheme.textColor
-                                                    : const Color(0xFF818181),
+                                                    color:
+                                                        _selectedResolution ==
+                                                                _resolutionMap[
+                                                                    'h']
+                                                            ? AppTheme.textColor
+                                                            : const Color(
+                                                                0xFF818181),
                                                     fontSize: 15,
                                                   ),
                                                 ),
@@ -2895,13 +2986,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   style: TextStyle(
                                                     fontWeight:
                                                         _selectedResolution ==
-                                                            _resolutionMap['d']
+                                                                _resolutionMap[
+                                                                    'd']
                                                             ? FontWeight.normal
                                                             : FontWeight.w500,
-                                                color: _selectedResolution ==
-                                                        _resolutionMap['d']
-                                                    ? AppTheme.textColor
-                                                    : const Color(0xFF818181),
+                                                    color:
+                                                        _selectedResolution ==
+                                                                _resolutionMap[
+                                                                    'd']
+                                                            ? AppTheme.textColor
+                                                            : const Color(
+                                                                0xFF818181),
                                                     fontSize: 15,
                                                   ),
                                                 ),
@@ -2910,8 +3005,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           ),
                                         ],
                                       ),
-                                  const SizedBox(height: 15),
-                                  Row(
+                                      const SizedBox(height: 15),
+                                      Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceAround,
                                         children: [
@@ -2920,18 +3015,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                            'MCAP',
+                                                'MCAP',
                                                 style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: AppTheme.textColor,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: AppTheme.textColor,
                                                   fontSize: 12,
                                                 ),
                                               ),
-                                          const SizedBox(height: 5),
+                                              const SizedBox(height: 5),
                                               Text(
-                                            _formatNumber(_mcap,
-                                                isCurrency: true),
-                                            style: const TextStyle(
+                                                _formatNumber(_mcap,
+                                                    isCurrency: true),
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.w300,
                                                   color: Color(0xFF818181),
                                                   fontSize: 12,
@@ -2944,18 +3039,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                            'FDMC',
+                                                'FDMC',
                                                 style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: AppTheme.textColor,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: AppTheme.textColor,
                                                   fontSize: 12,
                                                 ),
                                               ),
-                                          const SizedBox(height: 5),
+                                              const SizedBox(height: 5),
                                               Text(
-                                            _formatNumber(_fdmc,
-                                                isCurrency: true),
-                                            style: const TextStyle(
+                                                _formatNumber(_fdmc,
+                                                    isCurrency: true),
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.w300,
                                                   color: Color(0xFF818181),
                                                   fontSize: 12,
@@ -2970,16 +3065,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               Text(
                                                 'VOL',
                                                 style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: AppTheme.textColor,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: AppTheme.textColor,
                                                   fontSize: 12,
                                                 ),
                                               ),
-                                          const SizedBox(height: 5),
+                                              const SizedBox(height: 5),
                                               Text(
-                                            _formatNumber(_volume24h,
-                                                isCurrency: true),
-                                            style: const TextStyle(
+                                                _formatNumber(_volume24h,
+                                                    isCurrency: true),
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.w300,
                                                   color: Color(0xFF818181),
                                                   fontSize: 12,
@@ -2992,17 +3087,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                            '5M',
+                                                '5M',
                                                 style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: AppTheme.textColor,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: AppTheme.textColor,
                                                   fontSize: 12,
                                                 ),
                                               ),
-                                          const SizedBox(height: 5),
+                                              const SizedBox(height: 5),
                                               Text(
-                                            _formatPercentage(_priceChange5m),
-                                            style: const TextStyle(
+                                                _formatPercentage(
+                                                    _priceChange5m),
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.w300,
                                                   color: Color(0xFF818181),
                                                   fontSize: 12,
@@ -3015,17 +3111,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                            '1H',
+                                                '1H',
                                                 style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: AppTheme.textColor,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: AppTheme.textColor,
                                                   fontSize: 12,
                                                 ),
                                               ),
-                                          const SizedBox(height: 5),
+                                              const SizedBox(height: 5),
                                               Text(
-                                            _formatPercentage(_priceChange1h),
-                                            style: const TextStyle(
+                                                _formatPercentage(
+                                                    _priceChange1h),
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.w300,
                                                   color: Color(0xFF818181),
                                                   fontSize: 12,
@@ -3038,17 +3135,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                            '6H',
+                                                '6H',
                                                 style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: AppTheme.textColor,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: AppTheme.textColor,
                                                   fontSize: 12,
                                                 ),
                                               ),
-                                          const SizedBox(height: 5),
+                                              const SizedBox(height: 5),
                                               Text(
-                                            _formatPercentage(_priceChange6h),
-                                            style: const TextStyle(
+                                                _formatPercentage(
+                                                    _priceChange6h),
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.w300,
                                                   color: Color(0xFF818181),
                                                   fontSize: 12,
@@ -3058,11 +3156,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           ),
                                         ],
                                       ),
-                                  const SizedBox(height: 15),
+                                      const SizedBox(height: 15),
                                       Expanded(
                                         child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Expanded(
                                               child: Column(
@@ -3076,7 +3174,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                 height: 20,
                                                                 child:
                                                                     CircularProgressIndicator(
-                                                              strokeWidth: 2,
+                                                                  strokeWidth:
+                                                                      2,
                                                                   valueColor:
                                                                       AlwaysStoppedAnimation<
                                                                           Color>(
@@ -3086,92 +3185,87 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                 ),
                                                               ),
                                                             )
-                                                      : (_chartDataPoints !=
-                                                                  null &&
-                                                              _chartDataPoints!
-                                                                  .isNotEmpty)
-                                                          ? LayoutBuilder(
-                                                              builder: (context,
-                                                                  constraints) {
-                                                                final chartSize =
-                                                                    Size(
-                                                                  constraints.maxWidth
-                                                                              .isFinite &&
-                                                                          constraints.maxWidth >
-                                                                              0
-                                                                      ? constraints
-                                                                          .maxWidth
-                                                                      : 100.0,
-                                                                  constraints.maxHeight
-                                                                              .isFinite &&
-                                                                          constraints.maxHeight >
-                                                                              0
-                                                                      ? constraints
-                                                                          .maxHeight
-                                                                      : 100.0,
-                                                                );
+                                                          : (_chartDataPoints !=
+                                                                      null &&
+                                                                  _chartDataPoints!
+                                                                      .isNotEmpty)
+                                                              ? LayoutBuilder(
+                                                                  builder: (context,
+                                                                      constraints) {
+                                                                    final chartSize =
+                                                                        Size(
+                                                                      constraints.maxWidth.isFinite &&
+                                                                              constraints.maxWidth >
+                                                                                  0
+                                                                          ? constraints
+                                                                              .maxWidth
+                                                                          : 100.0,
+                                                                      constraints.maxHeight.isFinite &&
+                                                                              constraints.maxHeight >
+                                                                                  0
+                                                                          ? constraints
+                                                                              .maxHeight
+                                                                          : 100.0,
+                                                                    );
 
-                                                                return MouseRegion(
-                                                                  onHover:
-                                                                      (event) {
-                                                                    _handleChartPointer(
-                                                                        event
-                                                                            .localPosition,
-                                                                        chartSize);
+                                                                    return MouseRegion(
+                                                                      onHover:
+                                                                          (event) {
+                                                                        _handleChartPointer(
+                                                                            event.localPosition,
+                                                                            chartSize);
+                                                                      },
+                                                                      onExit:
+                                                                          (event) {
+                                                                        setState(
+                                                                            () {
+                                                                          _selectedPointIndex =
+                                                                              null;
+                                                                        });
+                                                                      },
+                                                                      child:
+                                                                          GestureDetector(
+                                                                        onPanUpdate:
+                                                                            (details) {
+                                                                          _handleChartPointer(
+                                                                              details.localPosition,
+                                                                              chartSize);
+                                                                        },
+                                                                        onPanEnd:
+                                                                            (details) {
+                                                                          setState(
+                                                                              () {
+                                                                            _selectedPointIndex =
+                                                                                null;
+                                                                          });
+                                                                        },
+                                                                        onPanCancel:
+                                                                            () {
+                                                                          setState(
+                                                                              () {
+                                                                            _selectedPointIndex =
+                                                                                null;
+                                                                          });
+                                                                        },
+                                                                        child:
+                                                                            CustomPaint(
+                                                                          painter:
+                                                                              DiagonalLinePainter(
+                                                                            dataPoints:
+                                                                                _chartDataPoints,
+                                                                            selectedPointIndex:
+                                                                                _selectedPointIndex,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    );
                                                                   },
-                                                                  onExit:
-                                                                      (event) {
-                                                                    setState(
-                                                                        () {
-                                                                      _selectedPointIndex =
-                                                                          null;
-                                                                    });
-                                                                  },
-                                                                  child:
-                                                                      GestureDetector(
-                                                                    onPanUpdate:
-                                                                        (details) {
-                                                                      _handleChartPointer(
-                                                                          details
-                                                                              .localPosition,
-                                                                          chartSize);
-                                                                    },
-                                                                    onPanEnd:
-                                                                        (details) {
-                                                                      setState(
-                                                                          () {
-                                                                        _selectedPointIndex =
-                                                                            null;
-                                                                      });
-                                                                    },
-                                                                    onPanCancel:
-                                                                        () {
-                                                                      setState(
-                                                                          () {
-                                                                        _selectedPointIndex =
-                                                                            null;
-                                                                      });
-                                                                    },
-                                                                    child:
-                                                                        CustomPaint(
-                                                              painter:
-                                                                  DiagonalLinePainter(
-                                                                dataPoints:
-                                                                    _chartDataPoints,
-                                                                        selectedPointIndex:
-                                                                            _selectedPointIndex,
-                                                              ),
-                                                            ),
-                                                    ),
-                                                                );
-                                                              },
-                                                            )
-                                                          : Container(
-                                                              // Transparent container to maintain layout
-                                                              color: Colors
-                                                                  .transparent,
-                                                              child:
-                                                                  _chartError !=
+                                                                )
+                                                              : Container(
+                                                                  // Transparent container to maintain layout
+                                                                  color: Colors
+                                                                      .transparent,
+                                                                  child: _chartError !=
                                                                           null
                                                                       ? Center(
                                                                           child:
@@ -3190,66 +3284,68 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                           ),
                                                                         )
                                                                       : null,
-                                                            ),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 5.0),
-                                              SizedBox(
-                                                height:
-                                                    15.0, // Fixed height to prevent layout shift
-                                                child: _selectedPointIndex != null &&
-                                                        _originalChartData !=
-                                                            null &&
-                                                        _selectedPointIndex! <
-                                                            _originalChartData!
-                                                                .length
-                                                    ? _buildSelectedPointTimestampRow()
-                                                    : Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                    children: [
-                                                      _buildTimestampWidget(
-                                                          _chartFirstTimestamp),
-                                                      _buildTimestampWidget(
-                                                          _chartLastTimestamp),
-                                                    ],
-                                                      ),
+                                                                ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 5.0),
+                                                  SizedBox(
+                                                    height:
+                                                        15.0, // Fixed height to prevent layout shift
+                                                    child: _selectedPointIndex != null &&
+                                                            _originalChartData !=
+                                                                null &&
+                                                            _selectedPointIndex! <
+                                                                _originalChartData!
+                                                                    .length
+                                                        ? _buildSelectedPointTimestampRow()
+                                                        : Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              _buildTimestampWidget(
+                                                                  _chartFirstTimestamp),
+                                                              _buildTimestampWidget(
+                                                                  _chartLastTimestamp),
+                                                            ],
+                                                          ),
                                                   )
                                                 ],
                                               ),
                                             ),
                                             const SizedBox(width: 5),
-                                        // Price column: height = chart space (from max point to min point), top-aligned
-                                        // The chart is in an Expanded Column, so we use LayoutBuilder
-                                        // to get the actual chart height
-                                        LayoutBuilder(
-                                          builder: (context, rowConstraints) {
-                                            // The Row contains: Expanded Column + SizedBox(width: 5) + price column
-                                            // The Column contains: Expanded (chart) + SizedBox(5px) + SizedBox(15px timestamps)
-                                            // Chart space = Expanded widget height = Row height - 5px (spacing) - 15px (timestamps)
-                                            // Price column height = chart space (full height from max to min point)
-                                            final chartSpaceHeight =
-                                                rowConstraints.maxHeight -
-                                                    5.0 -
-                                                    15.0;
+                                            // Price column: height = chart space (from max point to min point), top-aligned
+                                            // The chart is in an Expanded Column, so we use LayoutBuilder
+                                            // to get the actual chart height
+                                            LayoutBuilder(
+                                              builder:
+                                                  (context, rowConstraints) {
+                                                // The Row contains: Expanded Column + SizedBox(width: 5) + price column
+                                                // The Column contains: Expanded (chart) + SizedBox(5px) + SizedBox(15px timestamps)
+                                                // Chart space = Expanded widget height = Row height - 5px (spacing) - 15px (timestamps)
+                                                // Price column height = chart space (full height from max to min point)
+                                                final chartSpaceHeight =
+                                                    rowConstraints.maxHeight -
+                                                        5.0 -
+                                                        15.0;
 
-                                            return SizedBox(
-                                              width: _calculateMaxPriceWidth(),
-                                              height: chartSpaceHeight,
-                                              child: _selectedPointIndex != null &&
-                                                      _originalChartData !=
-                                                          null &&
-                                                      _selectedPointIndex! <
-                                                          _originalChartData!
-                                                              .length
-                                                  ? _buildSelectedPointPriceColumn()
-                                                  : _buildNormalPriceColumn(),
-                                            );
-                                          },
+                                                return SizedBox(
+                                                  width:
+                                                      _calculateMaxPriceWidth(),
+                                                  height: chartSpaceHeight,
+                                                  child: _selectedPointIndex != null &&
+                                                          _originalChartData !=
+                                                              null &&
+                                                          _selectedPointIndex! <
+                                                              _originalChartData!
+                                                                  .length
+                                                      ? _buildSelectedPointPriceColumn()
+                                                      : _buildNormalPriceColumn(),
+                                                );
+                                              },
                                             ),
                                           ],
                                         ),
@@ -3262,16 +3358,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.only(
-                              top: 20, bottom: 0, left: 15, right: 15),
+                                  top: 20, bottom: 0, left: 15, right: 15),
                               child: Column(children: [
                                 Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                Text('Buy',
+                                    Text('Buy',
                                         style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      color: AppTheme.textColor,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppTheme.textColor,
                                           fontSize: 20,
                                         )),
                                     SizedBox(
@@ -3312,39 +3409,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ),
                                 const SizedBox(height: 15),
                                 Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                Text(
-                                    _buyAmount
-                                        .toStringAsFixed(6)
-                                        .replaceAll(RegExp(r'0+$'), '')
-                                        .replaceAll(RegExp(r'\.$'), ''),
+                                    Text(
+                                        _buyAmount
+                                            .toStringAsFixed(6)
+                                            .replaceAll(RegExp(r'0+$'), '')
+                                            .replaceAll(RegExp(r'\.$'), ''),
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 20,
-                                      color: AppTheme.textColor,
+                                          color: AppTheme.textColor,
                                         )),
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Image.asset('assets/sample/ton.png',
                                             width: 20,
                                             height: 20,
                                             fit: BoxFit.contain),
                                         const SizedBox(width: 8),
-                                    Text(_buyCurrency.toLowerCase(),
+                                        Text(_buyCurrency.toLowerCase(),
                                             style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: AppTheme.textColor,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppTheme.textColor,
                                               fontSize: 20,
                                             )),
                                         const SizedBox(width: 8),
                                         SvgPicture.asset(
-                                      AppTheme.isLightTheme
-                                          ? 'assets/icons/select_light.svg'
-                                          : 'assets/icons/select_dark.svg',
+                                          AppTheme.isLightTheme
+                                              ? 'assets/icons/select_light.svg'
+                                              : 'assets/icons/select_dark.svg',
                                           width: 5,
                                           height: 10,
                                         ),
@@ -3357,15 +3456,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                  Text(r'$1',
+                                      Text(r'$1',
                                           style: TextStyle(
-                                        fontWeight: FontWeight.w400,
+                                            fontWeight: FontWeight.w400,
                                             fontSize: 15,
                                             color: Color(0xFF818181),
                                           )),
-                                  Text('TON',
+                                      Text('TON',
                                           style: TextStyle(
-                                        fontWeight: FontWeight.w400,
+                                            fontWeight: FontWeight.w400,
                                             fontSize: 15,
                                             color: Color(0xFF818181),
                                           )),
@@ -3377,9 +3476,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 0, horizontal: 15),
                               child: SvgPicture.asset(
-                            AppTheme.isLightTheme
-                                ? 'assets/icons/rotate_light.svg'
-                                : 'assets/icons/rotate_dark.svg',
+                                AppTheme.isLightTheme
+                                    ? 'assets/icons/rotate_light.svg'
+                                    : 'assets/icons/rotate_dark.svg',
                                 width: 30,
                                 height: 30,
                               ),
@@ -3390,13 +3489,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   top: 15, bottom: 15, left: 15, right: 15),
                               child: Column(children: [
                                 Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                Text('Sell',
+                                    Text('Sell',
                                         style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      color: AppTheme.textColor,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppTheme.textColor,
                                           fontSize: 20,
                                         )),
                                     SizedBox(
@@ -3437,47 +3537,49 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ),
                                 const SizedBox(height: 15),
                                 Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                Text(
-                                    _isLoadingSwapAmount
-                                        ? '...'
-                                        : (_swapAmountError != null
-                                            ? 'Error'
-                                            : (_sellAmount != null
-                                                ? _sellAmount!
-                                                    .toStringAsFixed(6)
-                                                    .replaceAll(
-                                                        RegExp(r'0+$'), '')
-                                                    .replaceAll(
-                                                        RegExp(r'\.$'), '')
-                                                : '1')),
+                                    Text(
+                                        _isLoadingSwapAmount
+                                            ? '...'
+                                            : (_swapAmountError != null
+                                                ? 'Error'
+                                                : (_sellAmount != null
+                                                    ? _sellAmount!
+                                                        .toStringAsFixed(6)
+                                                        .replaceAll(
+                                                            RegExp(r'0+$'), '')
+                                                        .replaceAll(
+                                                            RegExp(r'\.$'), '')
+                                                    : '1')),
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 20,
-                                      color: AppTheme.textColor,
+                                          color: AppTheme.textColor,
                                         )),
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Image.asset('assets/sample/usdt.png',
                                             width: 20,
                                             height: 20,
                                             fit: BoxFit.contain),
                                         const SizedBox(width: 8),
-                                    Text(_sellCurrency.toLowerCase(),
+                                        Text(_sellCurrency.toLowerCase(),
                                             style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: AppTheme.textColor,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppTheme.textColor,
                                               fontSize: 20,
                                             )),
                                         const SizedBox(width: 8),
                                         SvgPicture.asset(
-                                      AppTheme.isLightTheme
-                                          ? 'assets/icons/select_light.svg'
-                                          : 'assets/icons/select_dark.svg',
+                                          AppTheme.isLightTheme
+                                              ? 'assets/icons/select_light.svg'
+                                              : 'assets/icons/select_dark.svg',
                                           width: 5,
                                           height: 10,
                                         ),
@@ -3490,42 +3592,42 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                  Text(r'$1',
+                                      Text(r'$1',
                                           style: TextStyle(
-                                        fontWeight: FontWeight.w400,
+                                            fontWeight: FontWeight.w400,
                                             fontSize: 15,
                                             color: Color(0xFF818181),
                                           )),
-                                  Text('TON',
+                                      Text('TON',
                                           style: TextStyle(
-                                        fontWeight: FontWeight.w400,
+                                            fontWeight: FontWeight.w400,
                                             fontSize: 15,
                                             color: Color(0xFF818181),
                                           )),
                                     ]),
                               ]),
                             ),
-                        Container(
-                          margin: const EdgeInsets.only(
-                              bottom: 10, right: 15, left: 15),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          decoration: BoxDecoration(
-                            color: AppTheme.buttonBackgroundColor,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  bottom: 10, right: 15, left: 15),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 15),
+                              decoration: BoxDecoration(
+                                color: AppTheme.buttonBackgroundColor,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Center(
                                     child: Text(
-                                  'Add wallet',
+                                      'Add wallet',
                                       style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: AppTheme.buttonTextColor,
-                                    fontSize: 15,
-                                    height: 20 / 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppTheme.buttonTextColor,
+                                        fontSize: 15,
+                                        height: 20 / 15,
                                       ),
                                     ),
                                   ),
@@ -3537,8 +3639,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.only(
-                      top: 10, bottom: 30, left: 15, right: 15),
+                      padding:
+                          const EdgeInsets.only(top: 10, left: 15, right: 15),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -3554,18 +3656,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         focusNode: _focusNode,
                                         enabled: true,
                                         readOnly: false,
-                                    cursorColor: AppTheme.textColor,
+                                        cursorColor: AppTheme.textColor,
                                         cursorHeight: 15,
                                         maxLines: 11,
                                         minLines: 1,
-                                    textAlignVertical: TextAlignVertical.center,
+                                        textAlignVertical:
+                                            TextAlignVertical.center,
                                         style: const TextStyle(
                                             fontFamily: 'Aeroport',
                                             fontSize: 15,
                                             fontWeight: FontWeight.w500,
                                             height: 2.0,
-                                        color:
-                                            Color.fromARGB(255, 255, 255, 255)),
+                                            color: Color.fromARGB(
+                                                255, 255, 255, 255)),
                                         onSubmitted: (value) {
                                           print(
                                               'TextField onSubmitted called with: "$value"'); // Debug
@@ -3580,8 +3683,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   _controller.text.isNotEmpty)
                                               ? null
                                               : 'Ask anything',
-                                      hintStyle: TextStyle(
-                                          color: AppTheme.textColor,
+                                          hintStyle: TextStyle(
+                                              color: AppTheme.textColor,
                                               fontFamily: 'Aeroport',
                                               fontSize: 15,
                                               fontWeight: FontWeight.w500,
@@ -3608,20 +3711,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         focusNode: _focusNode,
                                         enabled: true,
                                         readOnly: false,
-                                    cursorColor: AppTheme.textColor,
+                                        cursorColor: AppTheme.textColor,
                                         cursorHeight: 15,
                                         maxLines: 11,
                                         minLines: 1,
-                                    textAlignVertical:
-                                        _controller.text.split('\n').length == 1
+                                        textAlignVertical: _controller.text
+                                                    .split('\n')
+                                                    .length ==
+                                                1
                                             ? TextAlignVertical.center
                                             : TextAlignVertical.bottom,
-                                    style: TextStyle(
+                                        style: TextStyle(
                                             fontFamily: 'Aeroport',
                                             fontSize: 15,
                                             fontWeight: FontWeight.w500,
                                             height: 2,
-                                        color: AppTheme.textColor),
+                                            color: AppTheme.textColor),
                                         onSubmitted: (value) {
                                           print(
                                               'TextField onSubmitted called with: "$value"'); // Debug
@@ -3637,7 +3742,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               ? null
                                               : 'Ask anything',
                                           hintStyle: const TextStyle(
-                                          color: Color(0xFFFFFFFF),
+                                              color: Color(0xFFFFFFFF),
                                               fontFamily: 'Aeroport',
                                               fontSize: 15,
                                               fontWeight: FontWeight.w500,
@@ -3646,8 +3751,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           enabledBorder: InputBorder.none,
                                           focusedBorder: InputBorder.none,
                                           isDense: true,
-                                      contentPadding:
-                                          _controller.text.split('\n').length >
+                                          contentPadding: _controller.text
+                                                      .split('\n')
+                                                      .length >
                                                   1
                                               ? const EdgeInsets.only(
                                                   left: 0, right: 0, top: 11)
@@ -3658,27 +3764,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(width: 5),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 7.5),
-                        child: GestureDetector(
-                            onTap: () {
-                              print('Apply button tapped'); // Debug
-                              _navigateToNewPage();
-                            },
-                            child: SvgPicture.asset(
-                            AppTheme.isLightTheme
-                                ? 'assets/icons/apply_light.svg'
-                                : 'assets/icons/apply_dark.svg',
-                            width: 15,
-                            height: 10,
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 7.5),
+                            child: GestureDetector(
+                              onTap: () {
+                                print('Apply button tapped'); // Debug
+                                _navigateToNewPage();
+                              },
+                              child: SvgPicture.asset(
+                                AppTheme.isLightTheme
+                                    ? 'assets/icons/apply_light.svg'
+                                    : 'assets/icons/apply_dark.svg',
+                                width: 15,
+                                height: 10,
+                              ),
+                            ),
                           ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-          ),
-        ],
-      ),
+              ),
+            ),
           ),
         ),
       ),
@@ -3712,6 +3820,28 @@ class QAPair {
 }
 
 class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
+  // Helper method to calculate logo top padding
+  double _getLogoTopPadding() {
+    final service = TelegramSafeAreaService();
+    final safeAreaInset = service.getSafeAreaInset();
+    final contentSafeAreaInset = service.getContentSafeAreaInset();
+
+    // Formula: top SafeAreaInset + (top ContentSafeAreaInset / 2) - 15
+    // This centers the 30px logo in the content safe area zone, respecting the upper inset
+    final topPadding = safeAreaInset.top + (contentSafeAreaInset.top / 2) - 15;
+    return topPadding;
+  }
+
+  // Helper method to calculate adaptive bottom padding
+  double _getAdaptiveBottomPadding() {
+    final service = TelegramSafeAreaService();
+    final safeAreaInset = service.getSafeAreaInset();
+
+    // Formula: bottom SafeAreaInset + 30px
+    final bottomPadding = safeAreaInset.bottom + 30;
+    return bottomPadding;
+  }
+
   // List to store all Q&A pairs
   final List<QAPair> _qaPairs = [];
   final String _apiUrl = 'https://xp7k-production.up.railway.app';
@@ -4225,7 +4355,11 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
       ),
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
-        body: Center(
+        body: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: _getAdaptiveBottomPadding()),
+            child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
                 child: SizedBox(
@@ -4238,18 +4372,23 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                     children: [
                       GestureDetector(
                         onTap: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                          Navigator.of(context)
+                              .popUntil((route) => route.isFirst);
                         },
                         child: Container(
                           width: double.infinity,
-                      padding: const EdgeInsets.all(30),
-                      decoration: BoxDecoration(
-                        color: AppTheme.backgroundColor,
+                          padding: EdgeInsets.only(
+                              top: _getLogoTopPadding(),
+                              bottom: 30,
+                              left: 30,
+                              right: 30),
+                          decoration: BoxDecoration(
+                            color: AppTheme.backgroundColor,
                           ),
                           child: SvgPicture.asset(
-                        AppTheme.isLightTheme
-                            ? 'assets/images/logo_light.svg'
-                            : 'assets/images/logo_dark.svg',
+                            AppTheme.isLightTheme
+                                ? 'assets/images/logo_light.svg'
+                                : 'assets/images/logo_dark.svg',
                             width: 30,
                             height: 30,
                           ),
@@ -4268,9 +4407,11 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                   padding: const EdgeInsets.only(
                                       left: 20.0, right: 20.0),
                                   child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                children: _qaPairs.asMap().entries.map((entry) {
+                                    children:
+                                        _qaPairs.asMap().entries.map((entry) {
                                       final index = entry.key;
                                       final pair = entry.value;
                                       return Column(
@@ -4284,8 +4425,8 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                               fontFamily: 'Aeroport',
                                               fontSize: 20,
                                               fontWeight: FontWeight.w400,
-                                          color: Color.fromARGB(
-                                              255, 255, 255, 255),
+                                              color: Color.fromARGB(
+                                                  255, 255, 255, 255),
                                             ),
                                             textAlign: TextAlign.left,
                                           ),
@@ -4312,8 +4453,8 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                                     fontFamily: 'Aeroport',
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w400,
-                                                color: Color.fromARGB(
-                                                    255, 255, 255, 255),
+                                                    color: Color.fromARGB(
+                                                        255, 255, 255, 255),
                                                   ),
                                                   textAlign: TextAlign.left,
                                                 );
@@ -4337,7 +4478,7 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                                 fontFamily: 'Aeroport',
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w400,
-                                            color: Color(0xFFFFFFFF),
+                                                color: Color(0xFFFFFFFF),
                                               ),
                                               textAlign: TextAlign.left,
                                             )
@@ -4348,7 +4489,7 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                                 fontFamily: 'Aeroport',
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w400,
-                                            color: Color(0xFFFFFFFF),
+                                                color: Color(0xFFFFFFFF),
                                               ),
                                             ),
                                           // Add spacing between Q&A pairs (except for the last one in reversed list)
@@ -4369,21 +4510,23 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                 builder: (context, constraints) {
                                   // Check for valid constraints and scroll controller
                                   if (!_scrollController.hasClients ||
-                                  constraints.maxHeight == double.infinity ||
+                                      constraints.maxHeight ==
+                                          double.infinity ||
                                       constraints.maxHeight <= 0) {
                                     return const SizedBox.shrink();
                                   }
 
                                   try {
-                                final maxScroll =
-                                    _scrollController.position.maxScrollExtent;
+                                    final maxScroll = _scrollController
+                                        .position.maxScrollExtent;
                                     if (maxScroll <= 0) {
                                       return const SizedBox.shrink();
                                     }
 
-                                final containerHeight = constraints.maxHeight;
-                                final indicatorHeight =
-                                    (containerHeight * _scrollIndicatorHeight)
+                                    final containerHeight =
+                                        constraints.maxHeight;
+                                    final indicatorHeight = (containerHeight *
+                                            _scrollIndicatorHeight)
                                         .clamp(0.0, containerHeight);
                                     final availableSpace =
                                         (containerHeight - indicatorHeight)
@@ -4396,12 +4539,13 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                     return Align(
                                       alignment: Alignment.topCenter,
                                       child: Padding(
-                                    padding: EdgeInsets.only(top: topPosition),
+                                        padding:
+                                            EdgeInsets.only(top: topPosition),
                                         child: Container(
                                           width: 1.0,
                                           height: indicatorHeight.clamp(
                                               0.0, containerHeight),
-                                      color: const Color(0xFFFFFFFF),
+                                          color: const Color(0xFFFFFFFF),
                                         ),
                                       ),
                                     );
@@ -4426,7 +4570,8 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                           children: [
                             Expanded(
                               child: Container(
-                            constraints: const BoxConstraints(minHeight: 30),
+                                constraints:
+                                    const BoxConstraints(minHeight: 30),
                                 child: _inputController.text.isEmpty
                                     ? SizedBox(
                                         height: 30,
@@ -4434,18 +4579,18 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                           key: _inputTextFieldKey,
                                           controller: _inputController,
                                           focusNode: _inputFocusNode,
-                                      cursorColor: AppTheme.textColor,
+                                          cursorColor: AppTheme.textColor,
                                           cursorHeight: 15,
                                           maxLines: 11,
                                           minLines: 1,
                                           textAlignVertical:
                                               TextAlignVertical.center,
-                                      style: TextStyle(
+                                          style: TextStyle(
                                               fontFamily: 'Aeroport',
                                               fontSize: 15,
                                               fontWeight: FontWeight.w500,
                                               height: 2.0,
-                                          color: AppTheme.textColor),
+                                              color: AppTheme.textColor),
                                           onSubmitted: (value) {
                                             _askNewQuestion();
                                           },
@@ -4456,7 +4601,7 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                                 ? null
                                                 : 'Ask anything',
                                             hintStyle: const TextStyle(
-                                            color: Color(0xFFFFFFFF),
+                                                color: Color(0xFFFFFFFF),
                                                 fontFamily: 'Aeroport',
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500,
@@ -4471,32 +4616,35 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                                     right: 0,
                                                     top: 5,
                                                     bottom: 5)
-                                            : const EdgeInsets.only(right: 0),
+                                                : const EdgeInsets.only(
+                                                    right: 0),
                                           ),
                                         ),
                                       )
                                     : Padding(
-                                    padding: const EdgeInsets.only(bottom: 8),
+                                        padding:
+                                            const EdgeInsets.only(bottom: 8),
                                         child: TextField(
                                           key: _inputTextFieldKey,
                                           controller: _inputController,
                                           focusNode: _inputFocusNode,
-                                      cursorColor: AppTheme.textColor,
+                                          cursorColor: AppTheme.textColor,
                                           cursorHeight: 15,
                                           maxLines: 11,
                                           minLines: 1,
-                                      textAlignVertical: _inputController.text
+                                          textAlignVertical: _inputController
+                                                      .text
                                                       .split('\n')
                                                       .length ==
                                                   1
                                               ? TextAlignVertical.center
                                               : TextAlignVertical.bottom,
-                                      style: TextStyle(
+                                          style: TextStyle(
                                               fontFamily: 'Aeroport',
                                               fontSize: 15,
                                               fontWeight: FontWeight.w500,
                                               height: 2,
-                                          color: AppTheme.textColor),
+                                              color: AppTheme.textColor),
                                           onSubmitted: (value) {
                                             _askNewQuestion();
                                           },
@@ -4507,7 +4655,7 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                                 ? null
                                                 : 'Ask anything',
                                             hintStyle: const TextStyle(
-                                            color: Color(0xFFFFFFFF),
+                                                color: Color(0xFFFFFFFF),
                                                 fontFamily: 'Aeroport',
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500,
@@ -4516,13 +4664,15 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                             enabledBorder: InputBorder.none,
                                             focusedBorder: InputBorder.none,
                                             isDense: true,
-                                        contentPadding: _inputController.text
+                                            contentPadding: _inputController
+                                                        .text
                                                         .split('\n')
                                                         .length >
                                                     1
                                                 ? const EdgeInsets.only(
                                                     left: 0, right: 0, top: 11)
-                                            : const EdgeInsets.only(right: 0),
+                                                : const EdgeInsets.only(
+                                                    right: 0),
                                           ),
                                         ),
                                       ),
@@ -4534,11 +4684,11 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                                 _askNewQuestion();
                               },
                               child: SvgPicture.asset(
-                            AppTheme.isLightTheme
-                                ? 'assets/icons/apply_light.svg'
-                                : 'assets/icons/apply_dark.svg',
-                            width: 15,
-                            height: 10,
+                                AppTheme.isLightTheme
+                                    ? 'assets/icons/apply_light.svg'
+                                    : 'assets/icons/apply_dark.svg',
+                                width: 15,
+                                height: 10,
                               ),
                             ),
                           ],
@@ -4548,6 +4698,8 @@ class _NewPageState extends State<NewPage> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+            ),
+          ),
         ),
       ),
     );
